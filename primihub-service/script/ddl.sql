@@ -655,14 +655,15 @@ CREATE TABLE `sys_file`  (
                              PRIMARY KEY (`file_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1000 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文件表' ROW_FORMAT = Dynamic;
 
-DROP TABLE IF EXISTS `data_fusion_copy_task`;
-CREATE TABLE `data_fusion_copy_task` (
+DROP TABLE IF EXISTS `data_schedule_task`;
+CREATE TABLE `data_schedule_task` (
                                          `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
                                          `task_type` tinyint(4) NOT NULL COMMENT '任务类型 1 批量 2 单条',
                                          `current_offset` bigint(20) NOT NULL COMMENT '当前偏移量',
                                          `target_offset` bigint(20) NOT NULL COMMENT '目标便宜量',
-                                         `task_table` varchar(64) NOT NULL COMMENT '复制任务表名',
+                                         `task_table` varchar(64) NOT NULL COMMENT '任务表名',
                                          `server_address` varchar(64) COMMENT '发送地址',
+                                         `server_address_path` varchar(64) COMMENT '发送路径',
                                          `organ_id` varchar(64) COMMENT '机构ID',
                                          `latest_error_msg` varchar(1024) NOT NULL COMMENT '最近一次复制失败原因',
                                          `is_del` tinyint(4) NOT NULL COMMENT '是否删除',
