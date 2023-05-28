@@ -53,8 +53,6 @@ public class DataCopyService implements ApplicationContextAware {
     @Autowired
     private DataCopyPrimarydbRepository dataCopyPrimarydbRepository;
     @Autowired
-    private FusionResourceService fusionResourceService;
-    @Autowired
     private OtherBusinessesService otherBusinessesService;
     @Autowired
     private SysOrganSecondarydbRepository sysOrganSecondarydbRepository;
@@ -79,11 +77,6 @@ public class DataCopyService implements ApplicationContextAware {
 
         if(enu!=null) {
             int errorCount=0;
-            SysLocalOrganInfo sysLocalOrganInfo = organConfiguration.getSysLocalOrganInfo();
-            if (sysLocalOrganInfo==null||sysLocalOrganInfo.getOrganId()==null|| "".equals(sysLocalOrganInfo.getOrganId().trim())) {
-                return;
-            }
-
             while(startOffset<endOffset) {
                 log.info(startOffset+"-"+endOffset);
                 DataFusionCopyDto copyDto = new DataFusionCopyDto();
@@ -112,20 +105,17 @@ public class DataCopyService implements ApplicationContextAware {
                             isSuccess = false;
                             errorMsg = "机构信息查询null";
                         }else {
-                            for (int i=0; i<sysOrgans.size() -1; i++){
-                                SysOrgan organ = sysOrgans.get(i);
-                                if (organ.getExamineState().intValue() == 1) {
-                                    BaseResultEntity resultEntity = otherBusinessesService.syncGatewayApiData(copyDto, task.getServerAddress()+"/share/shareData/saveFusionResource", organ.getPublicKey());
-                                    if (!resultEntity.getCode().equals(BaseResultEnum.SUCCESS.getReturnCode())) {
-                                        isSuccess = false;
-                                        if (++errorCount >= 3) {
-                                            errorMsg = resultEntity.getMsg().substring(0, Math.min(1000, resultEntity.getMsg().length()));
-                                        }
+                            SysOrgan organ = sysOrgans.get(0);
+                            if (organ.getExamineState().intValue() == 1) {
+                                BaseResultEntity resultEntity = otherBusinessesService.syncGatewayApiData(copyDto, task.getServerAddress()+"/share/shareData/saveFusionResource", organ.getPublicKey());
+                                if (!resultEntity.getCode().equals(BaseResultEnum.SUCCESS.getReturnCode())) {
+                                    isSuccess = false;
+                                    if (++errorCount >= 3) {
+                                        errorMsg = resultEntity.getMsg().substring(0, Math.min(1000, resultEntity.getMsg().length()));
                                     }
-                                    break;
                                 }
+                                break;
                             }
-
                         }
 
                     } catch (Exception e) {

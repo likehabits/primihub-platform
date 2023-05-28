@@ -160,7 +160,7 @@ public class DataTaskService {
         }
         List<String> organIds = dataProjectOrgans.stream().map(DataProjectOrgan::getOrganId).collect(Collectors.toList());
         Map<String, SysOrgan> organListMap = otherBusinessesService.getOrganListMap(organIds);
-        List<String> organNames = new ArrayList<>();
+//        List<String> organNames = new ArrayList<>();
         for (DataProjectOrgan dataProjectOrgan : dataProjectOrgans) {
             if (!sysLocalOrganId.equals(dataProjectOrgan.getOrganId())){
                 if (organListMap.containsKey(dataProjectOrgan.getOrganId())){
@@ -172,10 +172,7 @@ public class DataTaskService {
                     }
                     String url = CommonConstant.PROJECT_SYNC_API_URL.replace("<address>", gatewayAddress.toString());
                     String publicKey = sysOrgan.getPublicKey();
-                    if (publicKey==null){
-                        url = url+"?ignore=ignore";
-                    }
-                    organNames.add(sysOrgan.getOrganName());
+//                    organNames.add(sysOrgan.getOrganName());
                     log.info("projectId:{} - OrganId:{} gatewayAddress api start:{}",dataProjectOrgan.getProjectId(),dataProjectOrgan.getOrganId(),System.currentTimeMillis());
                     otherBusinessesService.syncGatewayApiData(shareProjectVo,url,publicKey);
                     log.info("projectId:{} - OrganId:{} gatewayAddress api end:{}",dataProjectOrgan.getProjectId(),dataProjectOrgan.getOrganId(),System.currentTimeMillis());
@@ -184,7 +181,8 @@ public class DataTaskService {
         }
         DataProject dataProject = dataProjectRepository.selectDataProjectByProjectId(null, shareProjectVo.getProjectId());
         dataProject.setResourceNum(dataProjectRepository.selectProjectResourceByProjectId(shareProjectVo.getProjectId()).size());
-        dataProject.setProviderOrganNames(StringUtils.join(organNames,","));
+//        organNames.remove(organConfiguration.getSysLocalOrganName());
+//        dataProject.setProviderOrganNames(StringUtils.join(organNames,","));
         dataProjectPrRepository.updateDataProject(dataProject);
     }
 
@@ -215,9 +213,6 @@ public class DataTaskService {
                     log.info("OrganId:{} gatewayAddress api start:{}",organId,System.currentTimeMillis());
                     String url = CommonConstant.MODEL_SYNC_API_URL.replace("<address>", gatewayAddress.toString());
                     String publicKey = sysOrgan.getPublicKey();
-                    if (publicKey==null){
-                        url = url+"?ignore=ignore";
-                    }
                     otherBusinessesService.syncGatewayApiData(shareModelVo,url,publicKey);
                     log.info("modelUUID:{} - OrganId:{} gatewayAddress api end:{}",shareModelVo.getDataModel().getModelUUID(),organId,System.currentTimeMillis());
                 }
